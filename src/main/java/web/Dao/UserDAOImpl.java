@@ -1,6 +1,7 @@
 package web.Dao;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import web.Model.User;
 
 import javax.persistence.EntityManager;
@@ -15,34 +16,46 @@ public class UserDAOImpl implements UserDAO {
 
 
 
+    @Override
     public List<User> getAllUsers() {
-        List<User> users = entityManager.createQuery("from User", User.class).getResultList();
-        return users;
+        return entityManager.createQuery("from User", User.class).getResultList();
     }
 
 
+    @Override
     public void addUser(String userName, String email, int age) {
         entityManager.persist(new User(userName, email, age));
     }
 
     @Override
     public User getUserById(int Id) {
-        return (User) entityManager.createQuery("from User where id=" + Id).getResultList().get(0);
+        return entityManager.find(User.class, Id);
     }
 
     @Override
     public void deleteUserById(int Id) {
-        System.out.println(Id);
-        List<User> user = entityManager.createQuery("from User where id=" + Id).getResultList();
-        entityManager.remove(user.get(0));
+        entityManager.createQuery("DELETE User WHERE id =" + Id).executeUpdate();
     }
 
     @Override
     public void updateUser(int Id, String userName, String email, int age) {
-        User user = (User) entityManager.createQuery("from User where id=" + Id).getResultList().get(0);
+        User user = entityManager.find(User.class, Id);
         user.setUserName(userName);
         user.setAge(age);
         user.setEmail(email);
         entityManager.merge(user);
+
+    }
+
+    @Override
+    @Transactional
+    public void updateUser(User user) {
+        entityManager.merge(user);
+    }
+
+    @Override
+    @Transactional
+    public void addUser(User user) {
+        entityManager.persist(user);
     }
 }

@@ -1,29 +1,41 @@
 package web.Config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan("web")
+@EnableTransactionManagement
+@PropertySource("classpath:application.properties")
 public class SpringConfig {
+
+    @Value("${db.url}")
+    private String url;
+    @Value("${db.userName}")
+    private String userName;
+    @Value("${db.password}")
+    private String password;
 
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/test1");
-        dataSource.setUsername( "root" );
-        dataSource.setPassword( "" );
+        dataSource.setUrl(url);
+        dataSource.setUsername(userName);
+        dataSource.setPassword(password);
         System.out.println("1111111111 DATASOURCE STARTED");
         return dataSource;
     }
